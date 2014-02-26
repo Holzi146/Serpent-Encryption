@@ -10,3 +10,16 @@ C:\Users\Christoph\Desktop\Serpent\Serpent\bin\Debug\Serpent.exe
 C:\Users\Christoph\Desktop\Serpent\Serpent\bin\Debug\Serpent.pdb
 C:\Users\Christoph\Desktop\Serpent\Serpent\obj\Debug\Serpent.exe
 C:\Users\Christoph\Desktop\Serpent\Serpent\obj\Debug\Serpent.pdb
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\bin\Debug\Serpent.exe.config
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.exe
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.pdb
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\bin\Debug\Serpent.exe
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\bin\Debug\Serpent.pdb
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.csprojResolveAssemblyReference.cache
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\MainWindow.baml
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\MainWindow.g.cs
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\App.g.cs
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent_MarkupCompile.cache
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.g.resources
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.Properties.Resources.resources
+C:\Users\Christoph\Documents\GitHub\Serpent-Encryption\Serpent\obj\Debug\Serpent.csproj.GenerateResource.Cache

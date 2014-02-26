@@ -10,30 +10,26 @@ namespace Serpent
 {
     class CSerpent
     {
-        public CSerpent()
-		{
-		    
-		}
-
         private WORD[] roundKeys;
         const uint GOLDEN_RATIO = 0x9e3779b9;
 
-        /* ------------ FUNCTIONS FOR ENCRYPTION ------------ */
+        /* ------------ FUNCTIONS FOR ENCRYPTING ------------ */
 
         public WORD[] Encrypt(WORD[] input, WORD[] key)
         {
             /* Keyscheduling */
 
             WORD[] words;
-            /* Der Schlüssel wird, wenn er kürzer als 256 Bit lang ist, auf 256Bit aufgefüllt */
+            /* if keysize is smaller than 256 bits, then its going to be filled up */
             if (key.Length < 8)
             {
-                /* dies geschieht durch Anhängen einer 1 und der Rest wird mit 0 aufgefüllt */
+                /* to do so, we add a one and the rest is going to be filled with zeros */
                 words = new WORD[8];
                 Array.Copy(key, words, key.Length);
                 words[key.Length] = 1;
                 key = words;
             }
+
             else
             {
                 words = new WORD[8];
@@ -41,16 +37,17 @@ namespace Serpent
                 key = words;
             }            
 
-            /* die 8 32-Bit Wörter werden zu 132 32-Bit Prekeys expandiert */
+            /* expand the eight 32-Bit words to 132 32-bit prekeys */
             WORD[] prekeys = new WORD[140];
-            Array.Copy(key, prekeys, 8);            
+            Array.Copy(key, prekeys, 8);          
             for (WORD i = 8; i < prekeys.Length; i++)
             {
-                /* mit dieser Formel wird der Gesamtschlüssel gleichmäßig über die Rundenschlüssel verteilt */
+                /* with this formula we evenly distribute the key even though it had  a lot of zeros in it (because of filling it up) */
                 prekeys[i] = Rotate(prekeys[i - 8] ^ prekeys[i - 5] ^ prekeys[i - 3] ^ prekeys[i - 1] ^ GOLDEN_RATIO ^ i - 8, -11);
                 int num = (int)prekeys[i];
             }
-            /* jetzt wird noch die Initial Permutation angewandt und die Schlüssel sind fertig */
+
+            /* apply the initial permutation and the round keys are done */
             WORD[] tmp = new WORD[4];
             for (int j = 0; j < 33; j++)
             {
@@ -64,24 +61,25 @@ namespace Serpent
             /* Encryption*/
 
             WORD[] cipher = new WORD[] { input[0], input[1], input[2], input[3] };
-            /* Insgesamt 32, wovon 31 in ihren Operationen gleich ablaufen */
+            /* 32 rounds, in which 31 are the same */
             for (int i = 0; i < 31; i++)
             {
                 AddRoundKey(cipher, i);
                 Substitution(cipher, i, subbox);
                 EncryptTransformation(cipher);
             }
-            /* 32. Runde: hier wird keine Transformation angewandt, sondern mit dem 33. Schlüssel XOR-verknüpft */ 
+
+            /* 32th round: no transformation applied, just XOR-ing with the 33th round key */ 
             AddRoundKey(cipher, 31);
             Substitution(cipher, 31, subbox);
             AddRoundKey(cipher, 32);
+
             return cipher;
         }
 
         private void EncryptTransformation(WORD[] input)
         {
-            /* Operationen, die in jeder Runde angewandt werden müssen */
-
+            /* operations, that are used in every round */
             input[0] = Rotate(input[0], -13);
             input[2] = Rotate(input[2], -3);
             input[1] = input[1] ^ input[0] ^ input[2];
@@ -94,17 +92,17 @@ namespace Serpent
             input[2] = Rotate(input[2], -22);
         }
 
-        /* ------------ FUNKTIONEN DER ENTSCHLÜSSELUNG ------------ */
+        /* ------------ FUNCTIONS FOR DECRYPTING ------------ */
 
         public WORD[] Decrypt(WORD[] input, WORD[] key)
         {
             /* Keyscheduling */
 
             WORD[] words;
-            /* Der Schlüssel wird, wenn er kürzer als 256 Bit lang ist, auf 256Bit aufgefüllt */
+            /* if keysize is smaller than 256 bits, then its going to be filled up */
             if (key.Length < 8)
             {
-                /* dies geschieht durch Anhängen einer 1 und der Rest wird mit 0 aufgefüllt */
+                /* to do so, we add a one and the rest is going to be filled with zeros */
                 words = new WORD[8];
                 Array.Copy(key, words, key.Length);
                 words[key.Length] = 1;
@@ -117,16 +115,17 @@ namespace Serpent
                 key = words;
             }
 
-            /* die 8 32-Bit Wörter werden zu 132 32-Bit Prekeys expandiert */
+            /* expand the eight 32-Bit words to 132 32-bit prekeys */
             WORD[] prekeys = new WORD[140];
             Array.Copy(key, prekeys, 8);
             for (WORD i = 8; i < prekeys.Length; i++)
             {
-                /* mit dieser Formel wird der Gesamtschlüssel gleichmäßig über die Rundenschlüssel verteilt */
+                /* with this formula we evenly distribute the key even though it had  a lot of zeros in it (because of filling it up) */
                 prekeys[i] = Rotate(prekeys[i - 8] ^ prekeys[i - 5] ^ prekeys[i - 3] ^ prekeys[i - 1] ^ GOLDEN_RATIO ^ i - 8, -11);
                 int num = (int)prekeys[i];
             }
-            /* jetzt wird noch die Initial Permutation angewandt und die Schlüssel sind fertig */
+
+            /* apply the initial permutation and the round keys are done */
             WORD[] tmp = new WORD[4];
             for (int j = 0; j < 33; j++)
             {
@@ -140,7 +139,7 @@ namespace Serpent
             /* Decryption */
 
             WORD[] plain = new WORD[] { input[0], input[1], input[2], input[3] };
-            /* die 32. Runde von der Verschlüsselung ist hier die erste, da alles rückwärts gerechnet wird */
+            /* the 32 rounds are now performed backwards, beginning with round 32 */
             AddRoundKey(plain, 32);
             Substitution(plain, 31, invsubbox);
             AddRoundKey(plain, 31);
@@ -156,8 +155,7 @@ namespace Serpent
 
         private void DecryptTransformation(WORD[] input)
         {
-            /* auch beim Entschlüsselen müssen wieder Operationen angewandt werden, nur diesmal in die andere Richtung */
-
+            /* operations, that are used in every round */
             input[2] = Rotate(input[2], 22);
             input[0] = Rotate(input[0], 5);
             input[2] = input[2] ^ input[3] ^ input[1] << 7;
@@ -170,7 +168,7 @@ namespace Serpent
             input[0] = Rotate(input[0], 13);
         }
 
-        /* ------------ OPERATIONEN FÜR BEIDE ------------ */
+        /* ------------ OPERATIONS FOR BOTH ENCRYPTING AND DECRYPTING ------------ */
 
 		private WORD Rotate(WORD value, int positions)
 		{
@@ -179,9 +177,9 @@ namespace Serpent
 
 		private void Substitution(WORD[] input, int round, byte[][] substitution)
 		{
-            /* hier werden die Substitutionsboxen angewandt (je nach Richtung die normale oder die inverse Box (siehe unten) */
+            /* applying the S-boxes (normal for encrypting and inverse for decrypting) */
 	        byte[] tmp = substitution[round % 8];
-            /* Erzeugen eines Nibbles */
+            /* generatoing nibbles */
 			WORD num0 = input[0];
 			WORD num1 = input[1];
 			WORD num2 = input[2];
@@ -190,7 +188,7 @@ namespace Serpent
 			WORD num5 = 0;
 			WORD num6 = 0;
 			WORD num7 = 0;
-            /* Operationen für die Substitution */
+            /* operations for the substitution */
 			for (int i = 0; i < 32; i++)
 			{
 				WORD num8 = tmp[num0 >> (i & 31) & 1 | (num1 >> (i & 31) & 1) << 1 | (num2 >> (i & 31) & 1) << 2 | (num3 >> (i & 31) & 1) << 3];
@@ -199,23 +197,22 @@ namespace Serpent
 				num6 = num6 | (num8 >> 2 & 1) << (i & 31);
 				num7 = num7 | (num8 >> 3 & 1) << (i & 31);
 			}
-
 			input[0] = num4;
 			input[1] = num5;
 			input[2] = num6;
 			input[3] = num7;
 		}        
 
-        /* XOR-Verknüpfung vom Block und dem Rundenschlüssel (wird in jeder Runde gemacht) */
+        /* XOR the block with the round key (performed in every round) */
         private void AddRoundKey(WORD[] input, int round)
         {
             for (int i = 0; i < 4; i++)
                 input[i] = input[i] ^ roundKeys[round * 4 + i];
         }
 
-        /* ------------ SUBSTITUTIONSBOXEN ------------ */
+        /* ------------ S-BOXES ------------ */
 
-        /* Substitutionsbox zum Verschlüsseln */
+        /* S-box for encrypting */
         public static byte[][] subbox = new byte[][] 
         { 
             new byte[] { 3, 8, 15, 1, 10, 6, 5, 11, 14, 13, 4, 2, 7, 0, 9, 12 }, 
@@ -228,7 +225,7 @@ namespace Serpent
             new byte[] { 1, 13, 15, 0, 14, 8, 2, 11, 7, 4, 12, 10, 9, 3, 5, 6 } 
         };
 
-        /* Substitutionsbox zum Entschlüsseln */
+        /* S-box for decrypting */
         public static byte[][] invsubbox =
         {
             new byte[] { 13, 3, 11, 0, 10, 6, 5, 12, 1, 14, 4, 7, 15, 9, 8, 2 }, 
